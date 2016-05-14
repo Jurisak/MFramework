@@ -65,19 +65,25 @@ class ElevatorSystem(object):
             input_data = input()
         self.end_elevators(elevators)
 
-    def access_goal(self, elevators, goal):
+    def access_goal(self, elevators, goal, floor):
         for elevator in elevators:
             if elevator.is_elevator_on_goal():
+                elevator.set_goal(floor)
                 elevator.set_goal(goal)
                 return True
-            elif elevator.is_possible_pickup(goal):
-                elevator.add_pickup(goal)
+            elif elevator.is_possible_pickup(floor) and elevator.is_possible_pickup(goal):
+                elevator.add_pickup(floor)
+                elevator.set_goal(goal)
                 return True
         return False
 
     def do_elevator_logic(self, floor, goal, elevators):
-        if not self.access_goal(elevators, goal):
-            print("Schedule new sub goal for elevator")
+        if not self.access_goal(elevators, goal, floor):
+            # I don't have suitable elevator for a human so I will assigned it to the first one
+            for elevator in elevators:
+                elevator.set_goal(floor)
+                elevator.set_goal(goal)
+
 
     @staticmethod
     def is_order_in_input(input_data):
@@ -97,9 +103,7 @@ class ElevatorSystem(object):
         if len(input_data.strip()) == 0:
             return
 
-        if self.is_status_printing(input_data):
-            self.print_elevators_status(elevators)
-        elif self.is_order_in_input(input_data.strip()):
+        if self.is_order_in_input(input_data.strip()):
             floor, goal = self.parse_data_digits(input_data)
             if self.is_correct_floor_or_goal(floor) and self.is_correct_floor_or_goal(goal):
                 self.do_elevator_logic(floor, goal, elevators)
