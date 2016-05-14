@@ -22,8 +22,6 @@ class ElevatorSystem(object):
     @staticmethod
     def end_elevators(elevators):
         for elevator in elevators:
-            elevator.stop()
-        for elevator in elevators:
             elevator.join()
 
     @staticmethod
@@ -40,18 +38,15 @@ class ElevatorSystem(object):
             elevator.print_status()
 
     @staticmethod
-    def is_order_in_input(input_data):
-        first_num = input_data[0]
-        second_num = input_data[-1]
-        return first_num.isdigit() and second_num.isdigit() and input_data.find(" ") != -1
+    def is_digit(input_data):
+        possible_digit = input_data.strip()
+        return possible_digit.isdigit()
 
-    def is_correct_floor_or_goal(self, data):
-        return int(self.floor_size) >= int(data)
+    def is_correct_goal(self, goal):
+        return int(self.floor_size) >= goal
 
-    @staticmethod
-    def parse_data_digits(input_data):
-        splited_by_space = input_data.split(" ")
-        return splited_by_space[0], splited_by_space[-1]
+    def get_goal(self, data):
+        return int(data.strip())
 
     @staticmethod
     def do_step(elevators):
@@ -70,20 +65,30 @@ class ElevatorSystem(object):
             input_data = input()
         self.end_elevators(elevators)
 
-    def do_elevator_logic(self, floor, goal, elevators):
+    def access_goal(self, elevators, goal):
         for elevator in elevators:
             if elevator.is_elevator_on_goal():
                 elevator.set_goal(int(goal))
-                break
+                return True
+            elif elevator.is_possible_pickup(goal):
+                elevator.add_pickup(goal)
+                return True
+        return False
+
+    def do_elevator_logic(self, goal, elevators):
+        if not self.access_goal(elevators, goal):
+            print("Schedule new sub goal for elevator")
 
     def do_behavior_logic(self, input_data, elevators):
+        if len(input_data.strip()) == 0:
+            return
+
         if self.is_status_printing(input_data):
             self.print_elevators_status(elevators)
-        elif self.is_order_in_input(input_data.strip()):
-            self.parse_data_digits(input_data)
-            floor, goal = self.parse_data_digits(input_data)
-            if self.is_correct_floor_or_goal(floor) and self.is_correct_floor_or_goal(goal):
-                self.do_elevator_logic(floor, goal, elevators)
+        elif self.is_digit(input_data):
+            goal = self.get_goal(input_data)
+            if self.is_correct_goal(goal):
+                self.do_elevator_logic(goal, elevators)
             else:
                 print("You've passed higher floor or goal value than it's possible")
                 print("Maximum floor size is {0}".format(self.floor_size))
@@ -91,5 +96,5 @@ class ElevatorSystem(object):
 
 # Run following code when the program starts
 if __name__ == '__main__':
-    system = ElevatorSystem(10, 4)
+    system = ElevatorSystem(10, 2)
     system.run_system()
