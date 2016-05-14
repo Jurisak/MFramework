@@ -11,7 +11,7 @@ This class represent single elevator. It has knowledge about floor, list of goal
 - `get_movement` - returns a move for a elevator step
 
 ### 1.2 class ElevatorSystem
-It's a main class which runs whole elevator behavior. It expects two variables. `floor_size` is indicating size of a house on which elevators are operating. elevators is number of elevators in a house.
+It's a main class which runs whole elevator behavior. It expects two variables: `floor_size` is indicating size of a house on which elevators are operating and `elevators` is number of elevators in a house.
 The most important method is `run_system` which runs the whole program. This method creates parallel `Elevator` classes and listens from input for commands. The commands are described in 1.3.
 
 ### 1.3 input commands
