@@ -68,16 +68,30 @@ class ElevatorSystem(object):
     def access_goal(self, elevators, goal):
         for elevator in elevators:
             if elevator.is_elevator_on_goal():
-                elevator.set_goal(int(goal))
+                elevator.set_goal(goal)
                 return True
             elif elevator.is_possible_pickup(goal):
                 elevator.add_pickup(goal)
                 return True
         return False
 
-    def do_elevator_logic(self, goal, elevators):
+    def do_elevator_logic(self, floor, goal, elevators):
         if not self.access_goal(elevators, goal):
             print("Schedule new sub goal for elevator")
+
+    @staticmethod
+    def is_order_in_input(input_data):
+        first_num = input_data[0]
+        second_num = input_data[-1]
+        return first_num.isdigit() and second_num.isdigit() and input_data.find(" ") != -1
+
+    @staticmethod
+    def parse_data_digits(input_data):
+        splited_by_space = input_data.split(" ")
+        return int(splited_by_space[0]), int(splited_by_space[-1])
+
+    def is_correct_floor_or_goal(self, data):
+        return int(self.floor_size) >= data
 
     def do_behavior_logic(self, input_data, elevators):
         if len(input_data.strip()) == 0:
@@ -85,10 +99,10 @@ class ElevatorSystem(object):
 
         if self.is_status_printing(input_data):
             self.print_elevators_status(elevators)
-        elif self.is_digit(input_data):
-            goal = self.get_goal(input_data)
-            if self.is_correct_goal(goal):
-                self.do_elevator_logic(goal, elevators)
+        elif self.is_order_in_input(input_data.strip()):
+            floor, goal = self.parse_data_digits(input_data)
+            if self.is_correct_floor_or_goal(floor) and self.is_correct_floor_or_goal(goal):
+                self.do_elevator_logic(floor, goal, elevators)
             else:
                 print("You've passed higher floor or goal value than it's possible")
                 print("Maximum floor size is {0}".format(self.floor_size))
